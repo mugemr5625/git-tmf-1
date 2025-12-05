@@ -1,0 +1,240 @@
+/* ListBranch Component Styles */
+
+.list-branch-page-content {
+  padding: 0px;
+}
+
+.list-branch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.list-branch-title {
+  margin-top: -25px;
+  margin-bottom: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.list-branch-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: -25px;
+}
+
+.list-branch-scrollable-div {
+  height: 500px;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  /* border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background-color: #fafafa; */
+}
+
+.list-branch-infinite-scroll {
+  padding: 0;
+  margin: 0;
+}
+
+.list-branch-divider-container {
+  margin: 16px 0;
+}
+
+.list-branch-divider-star {
+  color: red;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.list-branch-divider-text {
+  color: #595959;
+  font-size: 14px;
+}
+
+.list-branch-search-results {
+  padding: 12px 0px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.list-branch-search-label {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.list-branch-search-query {
+  font-weight: 600;
+  color: #1677ff;
+  font-size: 15px;
+}
+
+.list-branch-results-count {
+  margin-left: 12px;
+  font-size: 13px;
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.list-branch-item-wrapper {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 0;
+  margin-bottom: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.list-branch-item-wrapper:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: #d9d9d9;
+}
+
+.list-branch-item-wrapper:last-child {
+  margin-bottom: 0;
+}
+
+.list-branch-item {
+  background: #fff;
+  cursor: default;
+  height: 50px;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.list-branch-item-expanded {
+  background: #f9f9f9;
+  border-bottom: 1px solid #e8e8e8;
+  border-radius: 6px 6px 0 0;
+}
+
+.list-branch-item-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.list-branch-item-title {
+  font-weight: 600;
+  color: #262626;
+  font-size: 15px;
+}
+
+.list-branch-ellipsis-icon {
+  font-size: 22px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.list-branch-ellipsis-icon:hover {
+  color: #1890ff;
+  background-color: #f0f5ff;
+}
+
+.list-branch-collapse-content {
+  margin-top: 0;
+  padding: 16px;
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+}
+
+.list-branch-float-button {
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  position: fixed;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.list-branch-modal-title {
+  text-align: center;
+  width: 100%;
+}
+
+/* Single item styling improvements */
+.list-branch-infinite-scroll .ant-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.list-branch-infinite-scroll .ant-list-item {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Empty state styling */
+.list-branch-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8c8c8c;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px dashed #d9d9d9;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .list-branch-header {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .list-branch-title {
+    font-size: 20px;
+    margin-top: -15px;
+  }
+
+  .list-branch-actions {
+    margin-top: -15px;
+  }
+
+  .list-branch-scrollable-div {
+    height: calc(100vh - 200px);
+  }
+
+  .list-branch-item-wrapper {
+    margin-bottom: 8px;
+  }
+
+  .list-branch-item {
+    padding: 10px 12px;
+  }
+
+  .list-branch-item-title {
+    font-size: 14px;
+  }
+}
+
+/* Tablet responsiveness */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .list-branch-scrollable-div {
+    height: 450px;
+  }
+}
+
+/* Loading skeleton styling */
+.list-branch-infinite-scroll .ant-skeleton {
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+  margin-bottom: 12px;
+}

@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.tmf.rupee.financial.twa",
+    "sha256_cert_fingerprints": ["44:65:95:46:68:D6:04:7F:F0:53:66:97:C0:38:F8:FD:93:0D:C5:97:8C:29:8F:9D:63:B0:0B:33:A2:EC:83:3D"]
+  }
+}]

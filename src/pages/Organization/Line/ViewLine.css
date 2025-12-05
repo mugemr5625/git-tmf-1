@@ -1,0 +1,269 @@
+/* ViewLine Component Styles */
+
+.view-line-page-content {
+  padding: 0;
+  margin: 0px 0px;
+}
+
+.view-line-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0;
+  margin-left: 0;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.view-line-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.view-line-reorder-info {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+.view-line-branch-name {
+  color: #1677ff;
+  font-weight: 500;
+}
+
+.view-line-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-line-switch-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #595959;
+}
+
+.view-line-reorder-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 32px;
+}
+
+.view-line-reorder-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.view-line-table-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 16px 0;
+}
+
+.view-line-scrollable-div {
+  height: 500px;
+  width: auto;
+  overflow: auto;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.view-line-search-results {
+  padding: 12px 0px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.view-line-search-label {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.view-line-search-query {
+  font-weight: 600;
+  color: #1677ff;
+  font-size: 15px;
+}
+
+.view-line-results-count {
+  margin-left: 12px;
+  font-size: 13px;
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.view-line-branch-group {
+  margin-bottom: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.view-line-branch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ padding: 16px 5px;
+   background-color: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.view-line-branch-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-line-branch-title {
+  font-weight: 600;
+  font-size: 18px;
+  color: #262626;
+}
+
+.view-line-badge .ant-badge-count {
+  background-color: #52c41a !important;
+  font-weight: 500;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.view-line-badge-search .ant-badge-count {
+  background-color: #1677ff !important;
+  font-weight: 500;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.view-line-list-container {
+  max-height: 400px;
+  overflow: auto;
+  padding: 0;
+}
+
+.view-line-skeleton {
+  text-align: center;
+  padding: 16px;
+}
+
+.view-line-divider {
+  margin: 16px 0;
+}
+
+.view-line-divider-star {
+  color: red;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.view-line-divider-text {
+  color: #595959;
+  font-size: 14px;
+}
+
+.view-line-divider-branch-name {
+  font-weight: 600;
+  color: #262626;
+}
+
+.view-line-list {
+  background: #fafafa;
+  margin: 0;
+}
+
+.view-line-item-wrapper {
+  border-bottom: 2px solid #f0f0f0;
+  padding: 0;
+  background: #fff;
+}
+
+.view-line-item {
+  background: #fff;
+  cursor: default;
+  padding: 12px 16px;
+}
+
+.view-line-item-expanded {
+  background: #f9f9f9;
+}
+
+.view-line-avatar-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.view-line-avatar-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.view-line-item-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  margin-left: -10px;
+  padding: 6px 0;
+}
+
+.view-line-item-title {
+  font-weight: 600;
+  color: black;
+}
+
+.view-line-ellipsis-icon {
+  font-size: 22px;
+  color: #999;
+  cursor: pointer;
+}
+
+.view-line-collapse-content {
+  margin-top: 6px;
+  padding: 0 16px 16px 16px;
+  background: #f9f9f9;
+}
+
+.view-line-no-data {
+  text-align: center;
+  padding: 40px;
+  color: #8c8c8c;
+}
+
+.view-line-float-button {
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  position: fixed;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.view-line-modal-title {
+  text-align: center;
+  width: 100%;
+}
+
+.view-line-modal-label {
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.view-line-search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  outline: none;
+}

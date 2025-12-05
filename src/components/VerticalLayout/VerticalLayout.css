@@ -1,0 +1,231 @@
+/* CSS Custom Properties for dynamic sidebar width */
+:root {
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 80px;
+}
+
+/* Dynamic sidebar width calculation */
+.ant-layout-sider {
+  width: 250px !important;
+  min-width: var(--sidebar-collapsed-width) !important;
+  max-width: 300px !important;
+  flex: 0 0 250px !important;
+}
+
+.ant-layout-sider:not(.ant-layout-sider-collapsed) {
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 300px !important;
+  flex: 0 0 250px !important;
+}
+
+.ant-layout-sider.ant-layout-sider-collapsed {
+  width: var(--sidebar-collapsed-width) !important;
+  min-width: var(--sidebar-collapsed-width) !important;
+  max-width: var(--sidebar-collapsed-width) !important;
+}
+
+/* Header positioning fixes */
+.main-header {
+  z-index: 1000 !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.main-header.desktop-view {
+  left: var(--sidebar-width, 250px) !important;
+  width: calc(100% - var(--sidebar-width, 250px)) !important;
+}
+
+.main-header.desktop-view.sidebar-collapsed {
+  left: var(--sidebar-collapsed-width, 80px) !important;
+  width: calc(100% - var(--sidebar-collapsed-width, 80px)) !important;
+}
+
+.main-header.mobile-view {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+/* Force recalculation on layout changes - Desktop only */
+.main-layout.desktop-view.sidebar-expanded .main-header {
+  left: var(--sidebar-width, 250px) !important;
+  width: calc(100% - var(--sidebar-width, 250px)) !important;
+}
+
+.main-layout.desktop-view.sidebar-collapsed .main-header {
+  left: var(--sidebar-collapsed-width, 80px) !important;
+  width: calc(100% - var(--sidebar-collapsed-width, 80px)) !important;
+}
+
+/* Fallback positioning for when CSS variables aren't ready - Desktop only */
+.main-header.desktop-view:not(.sidebar-collapsed) {
+  left: 250px !important;
+  width: calc(100% - 250px) !important;
+}
+
+/* Mobile view always takes full width */
+.main-header.mobile-view {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+/* Menu container - prevent width changes during submenu operations */
+.ant-layout-sider .ant-menu {
+  width: 100% !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+}
+
+/* Menu item styling for stable width */
+.ant-layout-sider .ant-menu-item,
+.ant-layout-sider .ant-menu-submenu-title {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 0 24px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.ant-layout-sider .ant-menu-sub {
+  width: 100% !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  transition: all 0.2s ease-in-out !important;
+  overflow: hidden !important;
+}
+
+.ant-layout-sider .ant-menu-sub .ant-menu-item {
+  padding: 0 16px 0 48px !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  /* overflow: hidden !important; */
+  /* text-overflow: ellipsis !important; */
+  max-width: 100% !important;
+  transition: none !important;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Hide desktop sidebar on mobile */
+  .ant-layout-sider {
+    display: none !important;
+  }
+  
+  /* Mobile header adjustments - Always full width */
+  .main-header.mobile-view,
+  .mobile-view .main-header,
+  .ant-layout .main-header.mobile-view {
+    left: 0 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Mobile content adjustments */
+  .main-layout.mobile-view {
+    margin-left: 0 !important;
+  }
+  
+  /* Mobile drawer styling */
+  .ant-drawer-content-wrapper {
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .ant-drawer-body {
+    padding: 0 !important;
+  }
+  
+  /* Mobile drawer menu - reduce left spacing */
+  .ant-drawer .ant-menu {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Mobile drawer submenu expansion */
+  .ant-drawer .ant-menu-submenu-open > .ant-menu-sub {
+    display: block !important;
+    opacity: 1 !important;
+    max-height: 1000px !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+  
+  .ant-drawer .ant-menu-sub {
+    display: none !important;
+    opacity: 0 !important;
+    max-height: 0 !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+  
+  /* Mobile menu items - minimal left spacing */
+  .ant-drawer .ant-menu-item {
+    margin: 2px 8px 2px 4px !important;
+    border-radius: 6px !important;
+    height: 48px !important;
+    line-height: 48px !important;
+    padding: 0 12px !important;
+  }
+  
+  .ant-drawer .ant-menu-item:hover {
+    background-color: #f0f2ff !important;
+    color: #1890ff !important;
+  }
+  
+  .ant-drawer .ant-menu-item-selected {
+    background-color: #1890ff !important;
+    color: #fff !important;
+  }
+  
+  .ant-drawer .ant-menu-item .anticon {
+    margin-right: 8px !important;
+    font-size: 18px !important;
+  }
+  
+  /* Mobile submenu items - minimal left spacing */
+  .ant-drawer .ant-menu-submenu {
+    margin: 2px 8px 2px 4px !important;
+  }
+  
+  .ant-drawer .ant-menu-submenu-title {
+    border-radius: 6px !important;
+    height: 48px !important;
+    line-height: 48px !important;
+    padding: 0 12px !important;
+    transition: none !important;
+  }
+  
+  .ant-drawer .ant-menu-submenu-title:hover {
+    background-color: #f0f2ff !important;
+    color: #1890ff !important;
+  }
+  
+  .ant-drawer .ant-menu-submenu-title .anticon {
+    margin-right: 8px !important;
+    font-size: 18px !important;
+  }
+  
+  /* Mobile submenu container - minimal indentation */
+  .ant-drawer .ant-menu-sub {
+    background: transparent !important;
+    margin-left: 0 !important;
+    padding-left: 8px !important;
+    overflow: hidden !important;
+  }
+  
+  .ant-drawer .ant-menu-sub .ant-menu-item {
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 14px !important;
+    margin: 2px 8px 2px 12px !important;
+    padding: 0 12px !important;
+    transition: none !important;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 769px) {
+  /* Ensure mobile drawer is hidden on desktop */
+  .ant-drawer {
+    display: none !important;
+  }
+}
