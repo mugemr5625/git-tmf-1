@@ -322,35 +322,69 @@ useEffect(() => {
     };
 
     const handleGetCurrentLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    setSelectedLocation({
-                        lat: lat.toFixed(6),
-                        lng: lng.toFixed(6),
-                        address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
-                    });
-                    setMapCenter({ lat, lng });
-                },
-                (error) => {
-                    notification.error({
-                        message: 'Error',
-                        description: 'Unable to get current location',
-                        duration: 3,
-                    });
-                    console.error(error);
+    if (navigator.geolocation) {
+        notification.info({
+            message: 'Getting Location',
+            description: 'Please wait, detecting your precise location...',
+            duration: 3,
+        });
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+                
+                console.log('Location detected:', { 
+                    lat, 
+                    lng, 
+                    accuracy: `${accuracy.toFixed(0)} meters`,
+                    timestamp: new Date(position.timestamp).toLocaleString()
+                });
+                
+                setSelectedLocation({
+                    lat: lat.toFixed(6),
+                    lng: lng.toFixed(6),
+                    address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+                });
+                setMapCenter({ lat, lng });
+                
+                notification.success({
+                    message: 'Location Detected',
+                    description: `Accuracy: ${accuracy.toFixed(0)} meters`,
+                    duration: 3,
+                });
+            },
+            (error) => {
+                console.error('Geolocation error:', error);
+                
+                let errorMessage = 'Unable to get current location';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = 'Please allow location access in your browser settings';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = 'Location unavailable. Try enabling GPS on your device.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = 'Location request timed out. Please try again.';
+                        break;
                 }
-            );
-        } else {
-            notification.error({
-                message: 'Error',
-                description: 'Geolocation is not supported by your browser',
-                duration: 3,
-            });
-        }
-    };
+                
+                notification.error({
+                    message: 'Location Error',
+                    description: errorMessage,
+                    duration: 5,
+                });
+            },
+            {
+                enableHighAccuracy: true,  // Force GPS
+                timeout: 15000,             // Increase timeout
+                maximumAge: 0               // Don't use cached position
+            }
+        );
+    }
+};
 
     const handleMapModalOk = () => {
         if (selectedLocation) {
@@ -1126,7 +1160,7 @@ const onFinish = async (values) => {
     ]}
 >
     {/* NEW GOOGLE MAPS CODE STARTS HERE */}
-    <LoadScript googleMapsApiKey="AIzaSyBtk7IX-LndHF99lKR4JF6HPKGz6gFyTOM">
+    <LoadScript googleMapsApiKey="AIzaSyBqZO5W2UKl7m5gPxh0_KIjaRckuJ7VUsE">
         <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={mapCenter}
