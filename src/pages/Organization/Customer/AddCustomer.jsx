@@ -32,7 +32,7 @@ const AddCustomer = () => {
     const [mapModalVisible, setMapModalVisible] = useState(false);
     const [mapCenter, setMapCenter] = useState({ lat: 20.5937, lng: 78.9629 });
     const [selectedLocation, setSelectedLocation] = useState(null);
-    
+
     // LocalStorage states
     const [savedBranchName, setSavedBranchName] = useState(null);
     const [savedLineName, setSavedLineName] = useState(null);
@@ -51,7 +51,7 @@ const AddCustomer = () => {
             if (response?.status === 200) {
                 const data = response.data;
                 setAllData(data);
-                
+
                 // Extract unique branches
                 const branchMap = new Map();
                 data.forEach(item => {
@@ -63,7 +63,7 @@ const AddCustomer = () => {
                     }
                 });
                 const uniqueBranches = Array.from(branchMap.values());
-                
+
                 // Extract unique lines
                 const lineMap = new Map();
                 data.forEach(item => {
@@ -76,7 +76,7 @@ const AddCustomer = () => {
                     }
                 });
                 const uniqueLines = Array.from(lineMap.values());
-                
+
                 // Extract unique areas
                 const areaMap = new Map();
                 data.forEach(item => {
@@ -90,7 +90,7 @@ const AddCustomer = () => {
                     }
                 });
                 const uniqueAreas = Array.from(areaMap.values());
-                
+
                 setBranchList(uniqueBranches);
                 setLineList(uniqueLines);
                 setAreaList(uniqueAreas);
@@ -118,8 +118,8 @@ const AddCustomer = () => {
 
                     // Find the line ID from line name
                     const matchedLine = uniqueLines.find(
-                        line => line.name === storedLineName && 
-                               line.branch_id === matchedBranch?.id
+                        line => line.name === storedLineName &&
+                            line.branch_id === matchedBranch?.id
                     );
 
                     if (matchedBranch && matchedLine) {
@@ -137,8 +137,8 @@ const AddCustomer = () => {
                         setFilteredLineList(filteredLines);
 
                         const filteredAreas = uniqueAreas.filter(
-                            area => area.branch_id === matchedBranch.id && 
-                                   area.line_id === matchedLine.id
+                            area => area.branch_id === matchedBranch.id &&
+                                area.line_id === matchedLine.id
                         );
                         setFilteredAreaList(filteredAreas);
                     }
@@ -161,7 +161,7 @@ const AddCustomer = () => {
             const response = await GET('/api/customers/');
             if (response?.status === 200) {
                 const customers = response.data;
-                
+
                 if (customers && customers.length > 0) {
                     const maxId = Math.max(...customers.map(customer => customer.customer_order));
                     setNextCustomerId(maxId + 1);
@@ -177,7 +177,7 @@ const AddCustomer = () => {
 
     const handleBranchChange = (branchId) => {
         const filtered = allData.filter(item => item.branch_id === branchId);
-        
+
         const lineMap = new Map();
         filtered.forEach(item => {
             if (item.line_id && !lineMap.has(item.line_id)) {
@@ -190,18 +190,18 @@ const AddCustomer = () => {
         });
         const filteredLines = Array.from(lineMap.values());
         setFilteredLineList(filteredLines);
-        
+
         form.setFieldsValue({ line: undefined, area: undefined });
         setFilteredAreaList([]);
     };
 
     const handleLineChange = (lineId) => {
         const branchId = form.getFieldValue('branch');
-        
-        const filtered = allData.filter(item => 
+
+        const filtered = allData.filter(item =>
             item.branch_id === branchId && item.line_id === lineId
         );
-        
+
         const areaMap = new Map();
         filtered.forEach(item => {
             if (item.id && !areaMap.has(item.id)) {
@@ -215,79 +215,87 @@ const AddCustomer = () => {
         });
         const filteredAreas = Array.from(areaMap.values());
         setFilteredAreaList(filteredAreas);
-        
+
         form.setFieldsValue({ area: undefined });
     };
 
-   // Replace the getCustomerDetails function with this updated version:
+    // Replace the getCustomerDetails function with this updated version:
 
-const getCustomerDetails = useCallback(async () => {
-    try {
-        setLoader(true);
-        const response = await GET(`/api/customers/${params.id}/`);
-        if (response?.status === 200) {
-            const data = response?.data;
-            
-            // Find names for branch, line, and area from IDs
-            const customerBranch = branchList.find(b => b.id === data.branch);
-            const customerLine = lineList.find(l => l.id === data.line);
-            const customerArea = areaList.find(a => a.id === data.area);
-            
-            // Store the names for display
-            if (customerBranch) setSavedBranchName(customerBranch.branch_name);
-            if (customerLine) setSavedLineName(customerLine.name);
-            if (customerArea) setSavedAreaName(customerArea.name);
-            
-            // FIX: Ensure reference_contacts always has at least one field
-            if (!data.reference_contacts || data.reference_contacts.length === 0) {
-                data.reference_contacts = [{ reference_number: '' }];
+    const getCustomerDetails = useCallback(async () => {
+        try {
+            setLoader(true);
+            const response = await GET(`/api/customers/${params.id}/`);
+            if (response?.status === 200) {
+                const data = response?.data;
+
+                // Find names for display
+                const customerBranch = branchList.find(b => b.id === data.branch);
+                const customerLine = lineList.find(l => l.id === data.line);
+                const customerArea = areaList.find(a => a.id === data.area);
+
+                if (customerBranch) setSavedBranchName(customerBranch.branch_name);
+                if (customerLine) setSavedLineName(customerLine.name);
+                if (customerArea) setSavedAreaName(customerArea.name);
+
+                // Initialize reference contacts
+                if (!data.reference_contacts || data.reference_contacts.length === 0) {
+                    data.reference_contacts = [{ reference_number: '' }];
+                }
+
+                // ✅ OPTIMIZED: Load existing coordinates
+                if (data?.latitude && data?.longitude) {
+                    const lat = parseFloat(data.latitude);
+                    const lng = parseFloat(data.longitude);
+
+                    // Validate coordinates
+                    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        setSelectedLocation({
+                            lat: lat.toFixed(6),
+                            lng: lng.toFixed(6),
+                            address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+                        });
+
+                        setMapCenter({ lat, lng });
+                    }
+                }
+
+                form.setFieldsValue(data);
+                setIsPersonalInfoSubmitted(true);
+                setCurrentCustomerId(data?.id);
             }
-            
-            form.setFieldsValue(data);
-            setIsPersonalInfoSubmitted(true);
-            setCurrentCustomerId(data?.id);
-            
-            if (data?.latitude && data?.longitude) {
-                setSelectedLocation({
-                    lat: data.latitude,
-                    lng: data.longitude,
-                    address: `${data.latitude}, ${data.longitude}`
-                });
-            }
+            setLoader(false);
+        } catch (error) {
+            setLoader(false);
+            notification.error({
+                message: 'Error',
+                description: 'Failed to fetch customer details',
+                duration: 3,
+            });
+            console.error(error);
         }
-        setLoader(false);
-    } catch (error) {
-        setLoader(false);
-        notification.error({
-            message: 'Error',
-            description: 'Failed to fetch customer details',
-            duration: 3,
-        });
-        console.error(error);
-    }
-}, [params.id, form, branchList, lineList, areaList]);
+    }, [params.id, form, branchList, lineList, areaList]);
 
 
-// ALTERNATIVE SOLUTION: Update the useEffect that initializes the form
-// Replace the existing useEffect with this:
-
-useEffect(() => {
-    getAreaList();
-    
-    // Always initialize reference_contacts with at least one field
-    if (!params.id) {
-        getAllCustomers();
-    }
-    
-    // Initialize form with one reference contact field (for both add and edit)
-    form.setFieldsValue({
-        reference_contacts: [{ reference_number: '' }]
-    });
-}, [params.id, getAllCustomers, getAreaList, form]);
+    // ALTERNATIVE SOLUTION: Update the useEffect that initializes the form
+    // Replace the existing useEffect with this:
 
     useEffect(() => {
         getAreaList();
-        
+
+        // Always initialize reference_contacts with at least one field
+        if (!params.id) {
+            getAllCustomers();
+        }
+
+        // Initialize form with one reference contact field (for both add and edit)
+        form.setFieldsValue({
+            reference_contacts: [{ reference_number: '' }]
+        });
+    }, [params.id, getAllCustomers, getAreaList, form]);
+
+    useEffect(() => {
+        getAreaList();
+
         if (!params.id) {
             getAllCustomers();
             form.setFieldsValue({
@@ -304,51 +312,59 @@ useEffect(() => {
     }, [params.id, branchList, lineList, areaList, getCustomerDetails]);
 
     const openMapModal = () => {
+        // FIX: Always set the map center to selected location when opening modal
         if (selectedLocation) {
-            setMapCenter({ lat: selectedLocation.lat, lng: selectedLocation.lng });
+            const lat = parseFloat(selectedLocation.lat);
+            const lng = parseFloat(selectedLocation.lng);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                setMapCenter({ lat, lng });
+            }
+        } else {
+            // Default to India center if no location selected
+            setMapCenter({ lat: 20.5937, lng: 78.9629 });
         }
         setMapModalVisible(true);
     };
 
-    const handleMapClick = (e) => {
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
-        setSelectedLocation({
-            lat: lat.toFixed(6),
-            lng: lng.toFixed(6),
-            address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
-        });
-        setMapCenter({ lat, lng });
-    };
-
     const handleGetCurrentLocation = () => {
-    if (navigator.geolocation) {
+        if (!navigator.geolocation) {
+            notification.error({
+                message: 'Geolocation Not Supported',
+                description: 'Your browser does not support geolocation.',
+                duration: 5,
+            });
+            return;
+        }
+
         notification.info({
             message: 'Getting Location',
-            description: 'Please wait, detecting your precise location...',
+            description: 'Please allow location access and wait...',
             duration: 3,
         });
 
+        // OPTIMIZED: Get high-accuracy position
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 const accuracy = position.coords.accuracy;
-                
-                console.log('Location detected:', { 
-                    lat, 
-                    lng, 
+
+                console.log('Location detected:', {
+                    lat,
+                    lng,
                     accuracy: `${accuracy.toFixed(0)} meters`,
                     timestamp: new Date(position.timestamp).toLocaleString()
                 });
-                
+
+                // Round to 6 decimal places (≈0.11 meter accuracy)
                 setSelectedLocation({
                     lat: lat.toFixed(6),
                     lng: lng.toFixed(6),
                     address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
                 });
+
                 setMapCenter({ lat, lng });
-                
+
                 notification.success({
                     message: 'Location Detected',
                     description: `Accuracy: ${accuracy.toFixed(0)} meters`,
@@ -356,35 +372,55 @@ useEffect(() => {
                 });
             },
             (error) => {
-                console.error('Geolocation error:', error);
-                
                 let errorMessage = 'Unable to get current location';
-                switch(error.code) {
+                let errorDescription = '';
+
+                switch (error.code) {
                     case error.PERMISSION_DENIED:
-                        errorMessage = 'Please allow location access in your browser settings';
+                        errorMessage = 'Location Access Denied';
+                        errorDescription = 'Please allow location access in your browser settings.';
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        errorMessage = 'Location unavailable. Try enabling GPS on your device.';
+                        errorMessage = 'Location Unavailable';
+                        errorDescription = 'GPS/Location services may be disabled.';
                         break;
                     case error.TIMEOUT:
-                        errorMessage = 'Location request timed out. Please try again.';
+                        errorMessage = 'Request Timeout';
+                        errorDescription = 'Try again or check your GPS signal.';
                         break;
                 }
-                
+
                 notification.error({
-                    message: 'Location Error',
-                    description: errorMessage,
+                    message: errorMessage,
+                    description: errorDescription,
                     duration: 5,
                 });
             },
             {
-                enableHighAccuracy: true,  // Force GPS
-                timeout: 15000,             // Increase timeout
-                maximumAge: 0               // Don't use cached position
+                enableHighAccuracy: true,  // ✅ GPS for best accuracy
+                timeout: 15000,             // ✅ 15 seconds timeout
+                maximumAge: 0               // ✅ Force fresh location
             }
         );
-    }
-};
+    };
+
+    // Replace your handleMapClick function with this:
+
+    const handleMapClick = (e) => {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+
+        setSelectedLocation({
+            lat: lat.toFixed(6),
+            lng: lng.toFixed(6),
+            address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+        });
+
+        // Optional: Center map on clicked location
+        setMapCenter({ lat, lng });
+    };
+
+    // Replace your handleMapModalOk function with this:
 
     const handleMapModalOk = () => {
         if (selectedLocation) {
@@ -393,113 +429,119 @@ useEffect(() => {
                 longitude: parseFloat(selectedLocation.lng)
             });
             setMapModalVisible(false);
+
+            notification.success({
+                message: 'Location Set',
+                description: `Coordinates: ${selectedLocation.lat}, ${selectedLocation.lng}`,
+                duration: 2,
+            });
         } else {
             notification.error({
-                message: 'Error',
-                description: 'Please select a location on the map',
+                message: 'No Location Selected',
+                description: 'Please select a location on the map or use current location',
                 duration: 3,
             });
         }
     };
 
- // Replace the onFinish function with this updated version:
+    // Replace the onFinish function with this updated version:
 
-const onFinish = async (values) => {
-    setLoader(true);
-    try {
-        // Filter out empty reference contacts
-        const filteredReferenceContacts = (values.reference_contacts || []).filter(
-            contact => contact.reference_number && contact.reference_number.trim() !== ''
-        );
+    const onFinish = async (values) => {
+        setLoader(true);
+        try {
+            // Filter out empty reference contacts
+            const filteredReferenceContacts = (values.reference_contacts || []).filter(
+                contact => contact.reference_number && contact.reference_number.trim() !== ''
+            );
 
-        const payload = {
-            customer_name: values.customer_name,
-            mobile_number: values.mobile_number,
-            alternate_mobile_number: values.alternate_mobile_number || null,
-            email_id: values.email_id,
-            aadhaar_id: values.aadhaar_id,
-            pan_number: values.pan_number,
-            address: values.address,
-            profession: values.profession,
-            line: values.line,
-            area: values.area,
-            branch: values.branch,
-            latitude: values.latitude ? String(values.latitude) : null,
-            longitude: values.longitude ? String(values.longitude) : null,
-            customer_order: params.id ? values.customer_order : nextCustomerId,
-            reference_contacts: filteredReferenceContacts,
-        };
+            const payload = {
+                customer_name: values.customer_name,
+                mobile_number: values.mobile_number,
+                alternate_mobile_number: values.alternate_mobile_number || null,
+                email_id: values.email_id,
+                aadhaar_id: values.aadhaar_id,
+                pan_number: values.pan_number,
+                address: values.address,
+                profession: values.profession,
+                line: values.line,
+                area: values.area,
+                branch: values.branch,
+                latitude: values.latitude ? String(values.latitude) : null,
+                longitude: values.longitude ? String(values.longitude) : null,
+                customer_order: params.id ? values.customer_order : nextCustomerId,
+                reference_contacts: filteredReferenceContacts,
+            };
 
-        console.log('Payload being sent:', payload);
+            console.log('Payload being sent:', payload);
 
-        let response;
-        if (params.id) {
-            response = await PUT(`/api/customers/${params.id}/`, payload);
-        } else {
-            response = await POST('/api/customers/', payload);
-        }
-
-        setLoader(false);
-
-        if (response.status === 400) {
-            // Handle validation errors
-            const errorMessages = [];
-            
-            if (response?.data) {
-                Object.keys(response.data).forEach(key => {
-                    if (Array.isArray(response.data[key])) {
-                        errorMessages.push(`${key}: ${response.data[key][0]}`);
-                    } else {
-                        errorMessages.push(`${key}: ${response.data[key]}`);
-                    }
-                });
+            let response;
+            if (params.id) {
+                response = await PUT(`/api/customers/${params.id}/`, payload);
+            } else {
+                response = await POST('/api/customers/', payload);
             }
 
+            setLoader(false);
+
+            if (response.status === 400) {
+                // Handle validation errors
+                const errorMessages = [];
+
+                if (response?.data) {
+                    Object.keys(response.data).forEach(key => {
+                        if (Array.isArray(response.data[key])) {
+                            errorMessages.push(`${key}: ${response.data[key][0]}`);
+                        } else {
+                            errorMessages.push(`${key}: ${response.data[key]}`);
+                        }
+                    });
+                }
+
+                notification.error({
+                    message: 'Validation Error',
+                    description: errorMessages.length > 0
+                        ? errorMessages.join('\n')
+                        : (params.id ? 'Failed to update customer' : 'Failed to create customer'),
+                    duration: 5,
+                });
+                return;
+            }
+
+            notification.success({
+                message: `${values.customer_name} ${params.id ? 'Updated' : 'Added'}!`,
+                description: params.id
+                    ? 'Customer details updated successfully. You can now manage documents.'
+                    : 'Customer added successfully. You can now upload documents.',
+                duration: 3,
+            });
+
+            // FIX: In both add and edit mode, go to document upload tab
+            if (!params.id) {
+                // Add mode
+                form.setFieldsValue({ id: response?.data?.id });
+                setCurrentCustomerId(response?.data?.id);
+                setIsPersonalInfoSubmitted(true);
+                setActiveTab("2");
+            } else {
+                // Edit mode - also go to tab 2 instead of navigating away
+                setCurrentCustomerId(params.id);
+                setIsPersonalInfoSubmitted(true);
+                setActiveTab("2");
+            }
+        } catch (error) {
+            console.error('Submit error:', error);
             notification.error({
-                message: 'Validation Error',
-                description: errorMessages.length > 0 
-                    ? errorMessages.join('\n')
-                    : (params.id ? 'Failed to update customer' : 'Failed to create customer'),
+                message: 'Error',
+                description: error?.response?.data?.detail || 'An error occurred. Please try again.',
                 duration: 5,
             });
-            return;
+            setLoader(false);
         }
+    };
 
-        notification.success({
-            message: `${values.customer_name} ${params.id ? 'Updated' : 'Added'}!`,
-            description: params.id 
-                ? 'Customer details updated successfully. You can now manage documents.' 
-                : 'Customer added successfully. You can now upload documents.',
-            duration: 3,
-        });
-
-        // FIX: In both add and edit mode, go to document upload tab
-        if (!params.id) {
-            // Add mode
-            form.setFieldsValue({ id: response?.data?.id });
-            setCurrentCustomerId(response?.data?.id);
-            setIsPersonalInfoSubmitted(true);
-            setActiveTab("2");
-        } else {
-            // Edit mode - also go to tab 2 instead of navigating away
-            setCurrentCustomerId(params.id);
-            setIsPersonalInfoSubmitted(true);
-            setActiveTab("2");
-        }
-    } catch (error) {
-        console.error('Submit error:', error);
-        notification.error({
-            message: 'Error',
-            description: error?.response?.data?.detail || 'An error occurred. Please try again.',
-            duration: 5,
-        });
-        setLoader(false);
-    }
-};
-    
     const handleReset = () => {
         form.resetFields();
-        
+
         // If values are from localStorage, restore them
         if (isFromLocalStorage && savedBranchName && savedLineName && savedAreaId) {
             const matchedBranch = branchList.find(
@@ -528,7 +570,7 @@ const onFinish = async (values) => {
         try {
             setLoader(true);
             const response = await DELETE(`/api/customers/${params.id}/`);
-            
+
             if (response.status === 204 || response.status === 200) {
                 notification.success({
                     message: 'Customer Deleted',
@@ -557,16 +599,16 @@ const onFinish = async (values) => {
 
     const handleTabChange = (key) => {
         if (key === "2") {
-        // In add mode: only allow if personal info is submitted
-        if (!params.id && !isPersonalInfoSubmitted) {
-            notification.warning({
-                message: 'Complete Personal Information',
-                description: 'Please submit the personal information form before uploading documents.',
-                duration: 3,
-            });
-            return;
+            // In add mode: only allow if personal info is submitted
+            if (!params.id && !isPersonalInfoSubmitted) {
+                notification.warning({
+                    message: 'Complete Personal Information',
+                    description: 'Please submit the personal information form before uploading documents.',
+                    duration: 3,
+                });
+                return;
+            }
         }
-    }
         setActiveTab(key);
     };
 
@@ -618,10 +660,10 @@ const onFinish = async (values) => {
                                         { min: 2, message: 'Name must be at least 2 characters' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<UserOutlined />}
-                                        placeholder="Enter customer name" 
-                                        size="large" 
+                                        placeholder="Enter customer name"
+                                        size="large"
                                     />
                                 </Form.Item>
                             </div>
@@ -635,9 +677,9 @@ const onFinish = async (values) => {
                                         { pattern: /^\d{10}$/, message: 'Mobile number must be 10 digits' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<PhoneOutlined />}
-                                        placeholder="10 digit mobile number" 
+                                        placeholder="10 digit mobile number"
                                         size="large"
                                         maxLength={10}
                                     />
@@ -654,9 +696,9 @@ const onFinish = async (values) => {
                                         { pattern: /^\d{10}$/, message: 'Alternate mobile number must be 10 digits' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<PhoneOutlined />}
-                                        placeholder="10 digit alternate mobile number (optional)" 
+                                        placeholder="10 digit alternate mobile number (optional)"
                                         size="large"
                                         maxLength={10}
                                     />
@@ -672,9 +714,9 @@ const onFinish = async (values) => {
                                         { type: 'email', message: 'Please enter valid email' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<MailOutlined />}
-                                        placeholder="example@email.com" 
+                                        placeholder="example@email.com"
                                         size="large"
                                     />
                                 </Form.Item>
@@ -690,15 +732,15 @@ const onFinish = async (values) => {
                                         { required: true, message: 'Please enter profession' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={
-                                            <img 
-                                                src={professionIcon} 
-                                                alt="Profession Icon" 
+                                            <img
+                                                src={professionIcon}
+                                                alt="Profession Icon"
                                                 style={{ width: '16px', height: '16px', marginRight: '8px' }}
                                             />
                                         }
-                                        placeholder="Enter profession" 
+                                        placeholder="Enter profession"
                                         size="large"
                                     />
                                 </Form.Item>
@@ -713,9 +755,9 @@ const onFinish = async (values) => {
                                         { pattern: /^\d{12}$/, message: 'Aadhaar ID must be 12 digits' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<IdcardOutlined />}
-                                        placeholder="12 digit Aadhaar number" 
+                                        placeholder="12 digit Aadhaar number"
                                         size="large"
                                         maxLength={12}
                                     />
@@ -732,9 +774,9 @@ const onFinish = async (values) => {
                                         { required: true, message: 'Please enter PAN number' },
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<IdcardOutlined />}
-                                        placeholder="ABCDE1234F" 
+                                        placeholder="ABCDE1234F"
                                         size="large"
                                         maxLength={10}
                                         style={{ textTransform: 'uppercase' }}
@@ -750,9 +792,9 @@ const onFinish = async (values) => {
                                         { required: true, message: 'Please enter address' },
                                     ]}
                                 >
-                                    <Input.TextArea 
-                                     prefix={<IdcardOutlined />}
-                                        placeholder="Enter complete address" 
+                                    <Input.TextArea
+                                        prefix={<IdcardOutlined />}
+                                        placeholder="Enter complete address"
                                         rows={2}
                                         size="large"
                                         allowClear
@@ -761,8 +803,8 @@ const onFinish = async (values) => {
                             </div>
                         </div>
 
-                        <Divider className="add-customer-divider" style={{border: "1px solid #d9d9d9"}}/>
-                                        <Divider orientation="center">Location Details</Divider>
+                        <Divider className="add-customer-divider" style={{ border: "1px solid #d9d9d9" }} />
+                        <Divider orientation="center">Location Details</Divider>
                         {/* <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
                             Location Details
                         </h3> */}
@@ -781,10 +823,10 @@ const onFinish = async (values) => {
                         )} */}
 
                         {params.id && (
-                            <div style={{ 
-                                marginBottom: '16px', 
-                                padding: '12px', 
-                                background: '#fff7e6', 
+                            <div style={{
+                                marginBottom: '16px',
+                                padding: '12px',
+                                background: '#fff7e6',
                                 border: '1px solid #ffd591',
                                 borderRadius: '4px'
                             }}>
@@ -811,7 +853,7 @@ const onFinish = async (values) => {
                                                 value={savedBranchName}
                                                 size="large"
                                                 disabled
-                                                style={{ 
+                                                style={{
                                                     backgroundColor: '#f5f5f5',
                                                     color: '#000',
                                                     cursor: 'not-allowed'
@@ -865,7 +907,7 @@ const onFinish = async (values) => {
                                                 value={savedLineName}
                                                 size="large"
                                                 disabled
-                                                style={{ 
+                                                style={{
                                                     backgroundColor: '#f5f5f5',
                                                     color: '#000',
                                                     cursor: 'not-allowed'
@@ -919,7 +961,7 @@ const onFinish = async (values) => {
                                                 value={savedAreaName}
                                                 size="large"
                                                 disabled
-                                                style={{ 
+                                                style={{
                                                     backgroundColor: '#f5f5f5',
                                                     color: '#000',
                                                     cursor: 'not-allowed'
@@ -963,9 +1005,9 @@ const onFinish = async (values) => {
                                         { required: true, message: 'Please select location' }
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         prefix={<EnvironmentOutlined />}
-                                        placeholder="Click map icon to select location" 
+                                        placeholder="Click map icon to select location"
                                         size="large"
                                         disabled
                                         value={selectedLocation ? selectedLocation.address : ''}
@@ -989,12 +1031,12 @@ const onFinish = async (values) => {
                             <Input type="hidden" />
                         </Form.Item>
                         <Form.Item name="customer_order" style={{ display: 'none' }}>
-    <Input type="hidden" />
-</Form.Item>
+                            <Input type="hidden" />
+                        </Form.Item>
 
                         <Divider style={{ borderTop: "2px solid #d9d9d9" }} />
-<Divider orientation="center">Reference Contacts</Divider>
-                       
+                        <Divider orientation="center">Reference Contacts</Divider>
+
                         <Form.List name="reference_contacts">
                             {(fields, { add, remove }) => (
                                 <>
@@ -1008,7 +1050,7 @@ const onFinish = async (values) => {
                                                     rules={[
                                                         { pattern: /^\d{10}$/, message: 'Mobile number must be 10 digits' }
                                                     ]}
-                                                    style={{ flexGrow: 1, marginBottom: 0 }} 
+                                                    style={{ flexGrow: 1, marginBottom: 0 }}
                                                 >
                                                     <Input
                                                         prefix={<PhoneOutlined />}
@@ -1026,8 +1068,8 @@ const onFinish = async (values) => {
                                                         icon={<MinusOutlined />}
                                                         onClick={() => remove(name)}
                                                         style={{
-                                                            width: 35, 
-                                                            height: 35, 
+                                                            width: 35,
+                                                            height: 35,
                                                             backgroundColor: 'red',
                                                             borderColor: 'red',
                                                         }}
@@ -1069,14 +1111,14 @@ const onFinish = async (values) => {
                                 >
                                     Cancel
                                 </Button>
-                                 
+
                                 <Button type="primary" htmlType="submit" size="large">
                                     {params.id ? "Update Customer" : "Submit & Next"}
                                 </Button>
-                                
-                               
+
+
                             </Space>
-                             {/* {params.id && (
+                            {/* {params.id && (
                                     <Button 
                                         danger
                                         size="large"
@@ -1096,14 +1138,14 @@ const onFinish = async (values) => {
             label: (
                 <span>
                     <FileTextOutlined />
-                     Upload Doc
+                    Upload Doc
                 </span>
             ),
-            children: <AddCustomerDocument 
-                    customerId={currentCustomerId || params.id} 
-                    onPrevious={handlePreviousTab}
-                    onCancel={handleCancelForm}
-                />,
+            children: <AddCustomerDocument
+                customerId={currentCustomerId || params.id}
+                onPrevious={handlePreviousTab}
+                onCancel={handleCancelForm}
+            />,
         }
     ];
 
@@ -1131,64 +1173,106 @@ const onFinish = async (values) => {
                             />
 
                             {/* Map Modal */}
-                           {/* ... inside your return statement ... */}
+                            {/* ... inside your return statement ... */}
 
-<Modal
-    title="Select Location"
-    open={mapModalVisible}
-    onOk={handleMapModalOk}
-    onCancel={() => setMapModalVisible(false)}
-    width={800}
-    footer={[
-        <Button key="back" onClick={() => setMapModalVisible(false)}>
-            Cancel
-        </Button>,
-        <Button 
-            key="current" 
-            onClick={handleGetCurrentLocation}
-            style={{ marginRight: '8px' }}
-        >
-            Current Location
-        </Button>,
-        <Button 
-            key="submit" 
-            type="primary" 
-            onClick={handleMapModalOk}
-        >
-            Confirm Location
-        </Button>,
-    ]}
->
-    {/* NEW GOOGLE MAPS CODE STARTS HERE */}
-    <LoadScript googleMapsApiKey="AIzaSyBqZO5W2UKl7m5gPxh0_KIjaRckuJ7VUsE">
-        <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            center={mapCenter}
-            zoom={15}
-            onClick={handleMapClick}
-        >
-            {/* Show marker if a location is selected */}
-            {selectedLocation && (
-                <Marker
-                    position={{ 
-                        lat: parseFloat(selectedLocation.lat), 
-                        lng: parseFloat(selectedLocation.lng) 
-                    }}
-                />
-            )}
-        </GoogleMap>
-    </LoadScript>
-    
-    <div style={{ marginTop: '10px', padding: '10px', background: '#f5f5f5', borderRadius: '4px' }}>
-        <strong>Selected Coordinates: </strong>
-        {selectedLocation ? (
-            <span>{selectedLocation.lat}, {selectedLocation.lng}</span>
-        ) : (
-            <span style={{ color: '#999' }}>Click on the map to select</span>
-        )}
-    </div>
-    {/* NEW GOOGLE MAPS CODE ENDS HERE */}
-</Modal>
+                            <Modal
+                                title={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <EnvironmentOutlined style={{ color: '#1890ff' }} />
+                                        <span>Select Customer Location</span>
+                                    </div>
+                                }
+                                open={mapModalVisible}
+                                onOk={handleMapModalOk}
+                                onCancel={() => setMapModalVisible(false)}
+                                width={900}
+                                footer={[
+                                    <Button key="back" onClick={() => setMapModalVisible(false)}>
+                                        Cancel
+                                    </Button>,
+                                    <Button
+                                        key="current"
+                                        type="default"
+                                        icon={<EnvironmentOutlined />}
+                                        onClick={handleGetCurrentLocation}
+                                        style={{ marginRight: '8px' }}
+                                    >
+                                        Use Current Location
+                                    </Button>,
+                                    <Button
+                                        key="submit"
+                                        type="primary"
+                                        onClick={handleMapModalOk}
+                                        disabled={!selectedLocation}
+                                    >
+                                        Confirm Location
+                                    </Button>,
+                                ]}
+                            >
+                                <div style={{ marginBottom: '12px', padding: '10px', background: '#e6f7ff', borderRadius: '4px' }}>
+                                    <strong>Instructions:</strong> Click anywhere on the map to select a location, or use the "Use Current Location" button for precise GPS coordinates.
+                                </div>
+
+                                <LoadScript googleMapsApiKey="AIzaSyBqZO5W2UKl7m5gPxh0_KIjaRckuJ7VUsE">
+                                    <GoogleMap
+                                        mapContainerStyle={mapContainerStyle}
+                                        center={mapCenter}
+                                        zoom={15}
+                                        onClick={handleMapClick}
+                                        options={{
+                                            zoomControl: true,
+                                            streetViewControl: false,
+                                            mapTypeControl: true,
+                                            fullscreenControl: true,
+                                            gestureHandling: 'greedy',
+                                        }}
+                                    >
+                                        {selectedLocation && (
+                                            <Marker
+                                                position={{
+                                                    lat: parseFloat(selectedLocation.lat),
+                                                    lng: parseFloat(selectedLocation.lng)
+                                                }}
+                                                animation={window.google?.maps?.Animation?.DROP}
+                                            />
+                                        )}
+                                    </GoogleMap>
+                                </LoadScript>
+
+                                <div style={{
+                                    marginTop: '12px',
+                                    padding: '12px',
+                                    background: selectedLocation ? '#f6ffed' : '#f5f5f5',
+                                    borderRadius: '4px',
+                                    border: selectedLocation ? '1px solid #b7eb8f' : '1px solid #d9d9d9'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div>
+                                            <strong>Selected Coordinates:</strong>
+                                            {selectedLocation ? (
+                                                <div style={{ marginTop: '4px' }}>
+                                                    <span style={{ color: '#52c41a', fontWeight: 500 }}>
+                                                        Latitude: {selectedLocation.lat}, Longitude: {selectedLocation.lng}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span style={{ color: '#999', marginLeft: '8px' }}>
+                                                    No location selected yet
+                                                </span>
+                                            )}
+                                        </div>
+                                        {selectedLocation && (
+                                            <Button
+                                                size="small"
+                                                danger
+                                                onClick={() => setSelectedLocation(null)}
+                                            >
+                                                Clear
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </Modal>
                         </div>
                     </div>
                 </div>
